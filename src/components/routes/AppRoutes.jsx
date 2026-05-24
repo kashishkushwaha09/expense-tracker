@@ -3,6 +3,8 @@ import Layout from "../layout/Layout";
 import { Route, Routes } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import Login from "../../pages/Login";
+import Home from "../../pages/Home";
+import CompleteProfile from "../../pages/CompleteProfile";
 
 const AuthPage=lazy(()=>import("../../pages/AuthPage"))
 const AppRoutes = () => {
@@ -17,6 +19,13 @@ const AppRoutes = () => {
           </div>
         }
       >
+          <Routes>
+            <Route path="/" element={<Home/>}/>
+        </Routes>
+        
+          <Routes>
+            <Route path="/complete-profile" element={<CompleteProfile/>}/>
+        </Routes>
         <Routes>
             <Route path="/signup" element={<AuthPage/>}/>
         </Routes>

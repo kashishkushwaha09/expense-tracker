@@ -75,7 +75,9 @@ const LoginForm = () => {
       const resp = await login(email, password);
 
       console.log(resp);
-
+      if(!resp){
+        throw new Error("")
+      }
       navigate("/");
     } catch (error) {
       console.error("Login Error:", error);

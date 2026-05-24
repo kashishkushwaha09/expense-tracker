@@ -1,76 +1,115 @@
-import React, { createContext } from 'react'
-import { useState } from 'react';
+import React, { createContext } from "react";
+import { useState } from "react";
 
-export const AuthContext=createContext();
+export const AuthContext = createContext();
 
-export const AuthProvider=({children})=>{
-    const API_KEY="AIzaSyCvImdLW-QPJpNfOTNbhFkggxLferQdw1Q";
-    const [token, setToken] = useState(null);
-    const signup=async(email,password)=>{
-     try {
-       
-        const response=await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`,{
-            method:"POST",
-            headers:{
-                "Content-type":"application-json",
-            },
-            body:JSON.stringify({
-                email,
-                password,
-                returnSecureToken:true
-            }),
-        })
-        const data=await response.json();
-        setToken(data?.idToken);
-        localStorage.setItem(token,data?.idToken)
-        console.log(data);
-        return data;
-     } catch (error) {
-        console.error(error);
-        return null;
-     }
-    }
-    const login = async (email,password) => {
+export const AuthProvider = ({ children }) => {
+  const API_KEY = "AIzaSyCvImdLW-QPJpNfOTNbhFkggxLferQdw1Q";
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const authenticate = async (url, email, password) => {
   try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        returnSecureToken: true,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error.message);
+    }
+
+    setToken(data.idToken);
+    localStorage.setItem("token", data.idToken);
+
+    return {
+      success: true,
+      data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+  const signup = async (email, password) => {
+   return authenticate(
+     `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`,
+    email,
+    password
+   )
+  };
+  
+  const login = async (email, password) => {
+    return authenticate(
+       `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`,
+       email,
+       password
+    )
+   
+  };
+  const logout = () => {
+    setToken(null);
+    localStorage.removeItem("token");
+  };
+  const updateProfile = async (fullName, photoUrl) => {
+  try {
+    const token = localStorage.getItem("token");
+
     const response = await fetch(
-      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`,
+      `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${API_KEY}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: email,
-          password:password,
+          idToken: token,
+          displayName: fullName,
+          photoUrl: photoUrl,
           returnSecureToken: true,
         }),
       }
     );
 
     const data = await response.json();
-     setToken(data?.idToken);
-        localStorage.setItem(token,data?.idToken);
+
+    if (!response.ok) {
+      throw new Error(data.error.message);
+    }
+
     console.log(data);
-    return data;
+
+     return {
+      success: true,
+      data,
+    };
+
   } catch (error) {
-    console.log(error);
-    return null;
+    console.error(error);
+    return {
+      success: false,
+      message: error.message,
+    };
   }
 };
-const logout=()=>{
-    setToken(null);
-    localStorage.removeItem("token");
-}
-    const contextValue = {
+  const contextValue = {
     token,
     isAuthenticated: !!token,
     signup,
     login,
     logout,
+    updateProfile,
   };
-    return (
-        <AuthContext.Provider value={contextValue}>
-            {children}
-        </AuthContext.Provider>
-    )
-}
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
+};

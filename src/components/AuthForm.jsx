@@ -2,8 +2,10 @@ import React, { useState } from 'react'
 import InputField from './InputField'
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-
+import { useNavigate } from "react-router-dom";
 const AuthForm = () => {
+
+const navigate = useNavigate();
   const [formData,setFormData]=useState({
     email:"",
     password:"",
@@ -15,6 +17,7 @@ const AuthForm = () => {
     password:"",
     confirmPassword:""
   });
+  const [loading,setLoading]=useState();
  const {signup,login}=useContext(AuthContext);
   const handleChange=(e)=>{
     const { name, value } = e.target;
@@ -41,15 +44,37 @@ const AuthForm = () => {
       setError(newErrors);
       return !Object.values(newErrors).some((item)=>item);
   }
-  const handleSubmit=async(e)=>{
-    e.preventDefault();
-     const isValid=isFormValid();
-     if(isValid){
-        const {email,password}=formData;
-       const resp=await signup(email,password);
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-     }
+  if (loading) return;
+
+  setLoading(true);
+  setError({
+    main:"",
+    email:"",
+    password:"",
+    confirmPassword:""
+  })
+  try {
+    const isValid = isFormValid();
+
+    if (!isValid) return;
+
+    const { email, password } = formData;
+
+    const resp = await signup(email, password);
+
+    console.log(resp);
+    navigate("/login");
+  } catch (error) {
+    console.error("Signup Error:", error);
+    setError((prev)=>({...prev,main:error.message || "Something went wrong"}))
+  } finally {
+    setLoading(false);
   }
+};
+  
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
   <div className="card shadow p-4" style={{ width: "400px" }}>

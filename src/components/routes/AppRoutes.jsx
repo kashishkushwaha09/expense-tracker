@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from "react";
 import Layout from "../layout/Layout";
 import { Route, Routes } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
+import Login from "../../pages/Login";
 
 const AuthPage=lazy(()=>import("../../pages/AuthPage"))
 const AppRoutes = () => {
@@ -17,7 +18,10 @@ const AppRoutes = () => {
         }
       >
         <Routes>
-            <Route path="/login" element={<AuthPage/>}/>
+            <Route path="/signup" element={<AuthPage/>}/>
+        </Routes>
+        <Routes>
+            <Route path="/login" element={<Login/>}/>
         </Routes>
       </Suspense>
     </Layout>

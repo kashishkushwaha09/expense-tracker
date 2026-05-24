@@ -9,7 +9,8 @@ const ExpenseNav = () => {
           <Navbar.Brand href="#home">Expense Tracker</Navbar.Brand>
             <Nav className="ms-auto">
             <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/login">Sign up</Nav.Link>
+             <Nav.Link href="/login">Login</Nav.Link>
+            <Nav.Link href="/signup">Sign up</Nav.Link>
             {/* <Nav.Link href="#pricing">Pricing</Nav.Link> */}
           </Nav>
         </Container>

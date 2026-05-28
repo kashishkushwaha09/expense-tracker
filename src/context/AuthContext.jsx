@@ -101,6 +101,42 @@ export const AuthProvider = ({ children }) => {
     };
   }
 };
+const getUserProfile = async () => {
+  try {
+    const response = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          idToken: token,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error.message);
+    }
+
+    console.log(data);
+
+    return {
+      success: true,
+      data,
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
   const contextValue = {
     token,
     isAuthenticated: !!token,
@@ -108,6 +144,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateProfile,
+    getUserProfile
   };
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>

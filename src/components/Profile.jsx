@@ -4,7 +4,7 @@ import { FaUserCircle, FaGlobe } from "react-icons/fa";
 import { AuthContext } from "../context/AuthContext";
 
 const Profile = () => {
-  const { getUserProfile,updateProfile } = useContext(AuthContext);
+  const { getUserProfile,updateProfile,sendVerificationEmail } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     fullName: "",
     photoUrl: "",
@@ -68,8 +68,14 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className=" rounded p-4 shadow-sm bg-white">
-        <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className=" rounded p-4 shadow-sm bg-white d-flex flex-column">
+          <button
+      className="btn btn-warning ms-auto"
+      onClick={sendVerificationEmail}
+    >
+      Verify Email ID
+    </button>
+        <div className="d-flex justify-content-between align-items-center my-4">
           <h4 className="fw-bold">Contact Details</h4>
 
           <Button

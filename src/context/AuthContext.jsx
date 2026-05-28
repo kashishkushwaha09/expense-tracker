@@ -137,6 +137,56 @@ const getUserProfile = async () => {
     };
   }
 };
+const sendVerificationEmail = async () => {
+  try {
+    const idToken = localStorage.getItem("token");
+
+    if (!idToken) {
+      alert("User token missing. Please login again.");
+      return;
+    }
+
+    const response = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          requestType: "VERIFY_EMAIL",
+          idToken: idToken,
+        }),
+      }
+    );
+
+    const data = await response.json();
+    if (!response.ok) {
+      switch (data.error.message) {
+        case "INVALID_ID_TOKEN":
+          throw new Error("Session expired. Please login again.");
+
+        case "USER_NOT_FOUND":
+          throw new Error("User not found.");
+
+        case "TOO_MANY_ATTEMPTS_TRY_LATER":
+          throw new Error(
+            "Too many attempts. Please try again later."
+          );
+
+        default:
+          throw new Error(data.error.message);
+      }
+    }
+
+    alert(
+      "Check your email. You might have received a verification link."
+    );
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
+  }
+};
   const contextValue = {
     token,
     isAuthenticated: !!token,
@@ -144,7 +194,8 @@ const getUserProfile = async () => {
     login,
     logout,
     updateProfile,
-    getUserProfile
+    getUserProfile,
+    sendVerificationEmail
   };
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>

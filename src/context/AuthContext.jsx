@@ -187,6 +187,60 @@ const sendVerificationEmail = async () => {
     alert(error.message);
   }
 };
+const forgotPasswordHandler = async (email) => {
+  try {
+    if (!email) {
+      alert("Please enter your email.");
+      return;
+    }
+
+    const response = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          requestType: "PASSWORD_RESET",
+          email: email,
+        }),
+      }
+    );
+
+    const data = await response.json();
+    if (!response.ok) {
+      switch (data.error.message) {
+        case "EMAIL_NOT_FOUND":
+          throw new Error("No account found with this email.");
+
+        case "INVALID_EMAIL":
+          throw new Error("Invalid email address.");
+
+        case "MISSING_EMAIL":
+          throw new Error("Please enter email.");
+
+        case "TOO_MANY_ATTEMPTS_TRY_LATER":
+          throw new Error(
+            "Too many attempts. Please try again later."
+          );
+
+        case "USER_DISABLED":
+          throw new Error("This user account has been disabled.");
+
+        default:
+          throw new Error(data.error.message);
+      }
+    }
+
+    alert(
+      "Password reset link sent successfully. Please check your email."
+    );
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
+  }
+};
   const contextValue = {
     token,
     isAuthenticated: !!token,
@@ -195,7 +249,8 @@ const sendVerificationEmail = async () => {
     logout,
     updateProfile,
     getUserProfile,
-    sendVerificationEmail
+    sendVerificationEmail,
+    forgotPasswordHandler
   };
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>

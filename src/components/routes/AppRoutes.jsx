@@ -5,6 +5,7 @@ import { Spinner } from "react-bootstrap";
 import Login from "../../pages/Login";
 import Home from "../../pages/Home";
 import CompleteProfile from "../../pages/CompleteProfile";
+import ForgotPassword from "../../pages/ForgotPassword";
 
 const AuthPage=lazy(()=>import("../../pages/AuthPage"))
 const AppRoutes = () => {
@@ -31,6 +32,9 @@ const AppRoutes = () => {
         </Routes>
         <Routes>
             <Route path="/login" element={<Login/>}/>
+        </Routes>
+        <Routes>
+            <Route path="/forgot-password" element={<ForgotPassword/>}/>
         </Routes>
       </Suspense>
     </Layout>
